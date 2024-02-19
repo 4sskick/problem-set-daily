@@ -31,15 +31,29 @@ https://lodash.com/docs/4.17.15#curry
  * @returns { (...args: any[]) => any }
  */
 function curry(fn) {
-  // your code here
+  // here ...args collects arguments as array (rest)
   return function curried(...args) {
+    console.log(
+      `lenght args: ${args.length} <> fn: ${
+        fn.length
+      } with args: ${JSON.stringify(args)}`
+    );
+
     if (args.length >= fn.length) {
-      return fn.apply(this, args);
-    } else {
-      return function (...nextArgs) {
-        return curried.apply(this, args.concat(nextArgs));
-      };
+      // if yes, we spread args elements to pass into func (spread)
+      //using apply to invoke the function
+      //   return fn.apply(this, args);
+      return fn(...args);
     }
+
+    /* if not, we return a function that collects the next arguments passed in next and 
+      we recursively call curried, accumalating and spreading the values of args first and then
+      the values of next. next will take into consideration a variable amount of next arguments
+      e.g (1, 2) (1) (1,2,3) */
+    return function (...nextArgs) {
+      //   return curried.apply(this, args.concat(nextArgs));
+      return curried.call(this, ...args.concat(nextArgs));
+    };
   };
 }
 
@@ -49,5 +63,7 @@ const join = (a, b, c) => {
 
 const curriedJoin = curry(join);
 console.log(curriedJoin(1, 2, 3));
+console.log(curriedJoin()(1, 2, 3));
 console.log(curriedJoin(1)(2, 3));
 console.log(curriedJoin(1, 2)(3));
+console.log(curriedJoin(1)(2)(3));
